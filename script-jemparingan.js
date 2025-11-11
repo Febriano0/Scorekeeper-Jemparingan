@@ -243,8 +243,8 @@ document.addEventListener("DOMContentLoaded", () => {
   exportBtn.addEventListener('click', () => { exportCSV(); state.selectedId = null; render(); });
   resetBtn.addEventListener('click', resetRound);
   endBtn.addEventListener('click', () => {
-    if (state.competitors.length === 0) return alert('Tambahkan atlet dulu.');
-    if (!state.matchEnded && confirm('Akhiri sesi sekarang?')) endRound();
+    if (state.competitors.length === 0) return alert('Data kosong.');
+    if (!state.matchEnded && confirm('Akhiri sesi sekarang? Skor akan terkunci dan tidak dapat diubah (skor kosong akan terisi M)')) endRound();
   });
   nextEndBtn.addEventListener('click', () => {
     if (state.competitors.length === 0) return alert('Nama atlet kosong.');
