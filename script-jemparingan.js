@@ -34,7 +34,6 @@ document.addEventListener("DOMContentLoaded", () => {
     competitors: [],
     selectedId: null,
     currentEnd: 1,
-    // arrowsPerEnd: arrowsPerEndFixed, // <-- DIHAPUS (Tidak digunakan)
     matchEnded: false,
   };
 
@@ -243,13 +242,11 @@ document.addEventListener("DOMContentLoaded", () => {
   resetBtn.addEventListener('click', resetRound);
   
   endBtn.addEventListener('click', () => {
-    // --- REVISI ALERT ---
     if (state.competitors.length === 0) return alert('Data belum terisi'); 
     if (!state.matchEnded && confirm('Akhiri sesi sekarang? Skor akan terkunci dan tidak dapat diubah (skor kosong akan terisi M)')) endRound();
   });
 
   nextEndBtn.addEventListener('click', () => {
-    // --- REVISI ALERT ---
     if (state.competitors.length === 0) return alert('Data belum terisi');
     if (state.currentEnd === maxEnds) return;
     nextEnd();
@@ -274,23 +271,57 @@ document.addEventListener("DOMContentLoaded", () => {
     if (scoringButtonsByMode[mode].includes(key)) recordScore(key);
   });
 
+  // --- FUNGSI CSV DIPERBARUI (JUDUL DIPERSINGKAT) ---
   function exportCSV() {
-    const headers = ['Name','Total','Miss','Arrows'].join(',');
-    const rows = state.competitors.map(p => {
-      const arrowsList = [];
+    // 1. Buat Header (Judul Kolom)
+    const headers = ['Nama']; // <-- DIPERSINGKAT
+    for (let i = 1; i <= maxEnds; i++) {
+      headers.push(`R${i}`); // <-- DIPERSINGKAT
+    }
+    headers.push('Total'); // <-- DIPERSINGKAT
+    headers.push('Miss');  // <-- DIPERSINGKAT
+
+    // Urutkan data
+    const sortedCompetitors = [...state.competitors].sort((a, b) => b.total - a.total || a.missCount - b.missCount);
+
+    // 2. Buat Baris Data per Atlet (Gunakan data yang sudah diurutkan)
+    const rows = sortedCompetitors.map(p => {
+      const rowData = [];
+      rowData.push(`"${p.name}"`); 
+
       for (let end = 1; end <= maxEnds; end++) {
-        p.scores[end].forEach(a => { if (a) arrowsList.push(`E${end}:${a.isM ? 'M' : a.score}`); });
+        let rambahanTotal = 0;
+        const arrowsInEnd = p.scores[end]; 
+        
+        if (arrowsInEnd) {
+          arrowsInEnd.forEach(arrow => {
+            if (arrow) {
+              rambahanTotal += arrow.score;
+            }
+          });
+        }
+        rowData.push(rambahanTotal);
       }
-      const arrowsStr = arrowsList.join('|');
-      return [`"${p.name}"`, p.total, p.missCount, `"${arrowsStr}"`].join(',');
+
+      rowData.push(p.total);
+      rowData.push(p.missCount);
+
+      return rowData.join(',');
     });
-    const csv = [headers, ...rows].join('\n');
+
+    // 3. Gabungkan Header dan Baris Data
+    const csv = [headers.join(','), ...rows].join('\n');
+    
+    // 4. Proses Download
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = 'jemparingan_round.csv'; a.click();
+    a.href = url;
+    a.download = 'scoring_result.csv';
+    a.click();
     URL.revokeObjectURL(url);
   }
+  // --- AKHIR FUNGSI CSV BARU ---
 
   if (clockEl) {
     const updateClock = () => {
