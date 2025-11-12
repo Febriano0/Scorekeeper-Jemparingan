@@ -320,6 +320,11 @@ document.addEventListener("DOMContentLoaded", () => {
     
     state = { ...defaultState, competitors: [] }; 
     
+    // --- PERBAIKAN BUG ADA DI SINI ---
+    endBtn.classList.remove('done');    // 1. Hapus kelas hijau
+    endBtn.textContent = 'Akhiri Sesi'; // 2. Kembalikan teks asli
+    // --- AKHIR PERBAIKAN BUG ---
+    
     saveState();
     render();
   }
