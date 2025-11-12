@@ -223,7 +223,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const emptySlotIndex = currentScores.findIndex(s => s === null);
     
     if (emptySlotIndex === -1) { 
-      alert(`Skor Seri ${state.currentEnd} untuk ${p.name} sudah penuh (4 panah).`); 
+      // Cek apakah ini dipanggil dari processScannedScore (yang tidak akan menampilkan alert)
+      // atau dari recordScoreManual (yang akan menampilkan alert)
+      // Karena kita butuh alert di recordScoreManual, kita pindahkan alert ke sana.
+      // Cukup kembalikan false.
+      
+      // Jika dipanggil dari manual, alert akan muncul di 'recordScoreManual'
+      // Jika dipanggil dari scan, 'success' akan false dan ditangani di 'processScannedScore'
+      if (location === null) { // Asumsi 'location' ada jika dari scan
+           alert(`Skor Seri ${state.currentEnd} untuk ${p.name} sudah penuh (4 panah).`); 
+      }
       return false; // Gagal
     }
 
@@ -237,6 +246,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return true; // Sukses
   }
   
+  // --- FUNGSI INI YANG DIPERBAIKI ---
   function processScannedScore() {
     const queueJSON = localStorage.getItem('scannedScoresQueue');
     if (!queueJSON) return; 
@@ -245,9 +255,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const queue = JSON.parse(queueJSON);
       if (queue.length === 0) return;
 
-      localStorage.removeItem('scannedScoresQueue'); 
+      localStorage.removeItem('scannedScoresQueue'); // Hapus antrian di awal
       
       let processedSuccessfully = false; 
+      let rejectedScores = []; // Tampung skor yang ditolak
 
       for (const item of queue) {
         const atletName = item.name;
@@ -255,7 +266,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let p = state.competitors.find(c => c.name.toLowerCase() === atletName.toLowerCase());
         if (!p) {
-          p = addCompetitor(atletName);
+          p = addCompetitor(atletName); // Tambah jika atlet belum ada
         }
         
         state.selectedId = p.id; 
@@ -264,26 +275,30 @@ document.addEventListener("DOMContentLoaded", () => {
         if (success) {
           processedSuccessfully = true;
         } else {
-          let remainingQueue = [];
-          const failedIndex = queue.indexOf(item);
-          if (failedIndex !== -1) {
-            remainingQueue = queue.slice(failedIndex);
-            localStorage.setItem('scannedScoresQueue', JSON.stringify(remainingQueue));
-          }
-          break;
+          // --- INI PERBAIKANNYA ---
+          // Jangan masukkan kembali ke queue. Catat saja.
+          rejectedScores.push(item);
         }
       }
       
       if (processedSuccessfully) {
         state.competitors.forEach(p => recalculateStats(p));
         saveState();
+        // Render akan dipanggil di akhir setelah loadState()
+      }
+      
+      // Beri tahu pengguna jika ada skor yang ditolak
+      if (rejectedScores.length > 0) {
+        const rejectedNames = rejectedScores.map(item => `${item.name} (skor ${item.scoreData.score})`).join(', ');
+        alert(`Gagal memproses ${rejectedScores.length} skor dari pindaian (kemungkinan seri sudah penuh):\n${rejectedNames}`);
       }
 
     } catch (e) {
       console.error("Gagal memproses antrian skor:", e);
-      localStorage.removeItem('scannedScoresQueue');
+      localStorage.removeItem('scannedScoresQueue'); // Bersihkan jika ada error parse
     }
   }
+  // --- AKHIR PERBAIKAN ---
 
   function fillMissesForEnd(endNumber) {
     let changed = false;
@@ -457,6 +472,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   loadState();
-  processScannedScore();
-  render();
+  processScannedScore(); // Jalankan proses antrian setelah state dimuat
+  render(); // Render di akhir untuk menampilkan data yang sudah diproses
 });

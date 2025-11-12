@@ -179,7 +179,7 @@
       <div class="scan-area">
         <div class="corner-top-right"></div>
         <div class="corner-bottom-left"></div>
-        <span style="color: #bbb;">Arahkan Barcode Disini</span>
+        <span style="color: #bbb;">Arahkan barcode di sini</span>
       </div>
       
       <p>Barcode berisi nama atlet</p>
@@ -245,6 +245,15 @@
         localStorage.setItem('atletUntukScan', nameInput);
         window.location.href = 'visual-bandul.html';
       });
+
+      // --- 👇 TAMBAHAN FITUR ENTER ADA DI SINI 👇 ---
+      document.getElementById('fakeScanInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault(); // Mencegah default action (seperti submit form)
+          document.getElementById('fakeScanBtn').click(); // Memicu klik pada tombol
+        }
+      });
+      // --- AKHIR TAMBAHAN ---
 
     });
   </script>
