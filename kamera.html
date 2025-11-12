@@ -12,23 +12,19 @@
       color: white; 
       margin: 0;
       height: 100vh;
-      overflow: hidden; 
-    }
-    
-    .scale-wrapper {
+      /* --- PERUBAHAN: Hapus overflow hidden, tambah flex --- */
       display: flex;
       flex-direction: column;
-      height: 100vh; 
       align-items: center;
       justify-content: center;
-      transform: scale(1.25);
-      transform-origin: center center; 
-      overflow-y: auto; 
-      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
     }
     
+    /* --- PERUBAHAN: Hapus .scale-wrapper --- */
+    
     .wrap {
-      width: 90%;
+      width: 100%;
       max-width: 450px; 
       text-align: center;
     }
@@ -41,8 +37,12 @@
     
     .scan-area {
       position: relative; 
-      width: 300px; 
-      height: 300px; 
+      /* --- PERUBAHAN: Buat responsif --- */
+      width: 80vw; 
+      height: 80vw;
+      max-width: 300px;
+      max-height: 300px;
+      
       border: 2px solid rgba(255, 255, 255, 0.2); 
       border-radius: 10px; 
       display: flex;
@@ -156,16 +156,10 @@
     .footer-watermark {
       text-align:center;
       font-size:12px;
-
       color: #aaa;
       margin-top:25px; 
       padding-bottom: 15px;
       width: 100%; 
-      min-height: 30px; 
-      display: flex; 
-      align-items: center; 
-      justify-content: center; 
-      flex-shrink: 0; 
     }
   </style>
 </head>
@@ -173,24 +167,23 @@
 
   <a href="jemparingan.html" id="closeBtn" title="Selesai & Kembali">&times;</a>
 
-  <div class="scale-wrapper">
-    <div class="wrap">
-      <h1>Scan Barcode Anak Panah</h1>
-      <div class="scan-area">
-        <div class="corner-top-right"></div>
-        <div class="corner-bottom-left"></div>
-        <span style="color: #bbb;">Arahkan barcode di sini</span>
-      </div>
-      
-      <p>Barcode berisi nama atlet</p>
-      <input type="text" id="fakeScanInput" placeholder="Masukkan isi barcode" />
-      <button id="fakeScanBtn">Simulasikan Scan & Lanjut</button>
+  <div class="wrap">
+    <h1>Scan Barcode Anak Panah</h1>
+    <div class="scan-area">
+      <div class="corner-top-right"></div>
+      <div class="corner-bottom-left"></div>
+      <span style="color: #bbb;">Arahkan barcode di sini</span>
     </div>
-
-    <div class="footer-watermark"> 
-      Jemparingan Scorekeeper © 2025 — v1.3 by Kevin Febriano
-    </div>
+    
+    <p>Barcode berisi nama atlet</p>
+    <input type="text" id="fakeScanInput" placeholder="Masukkan isi barcode" />
+    <button id="fakeScanBtn">Simulasikan Scan & Lanjut</button>
   </div>
+
+  <div class="footer-watermark"> 
+    Jemparingan Scorekeeper © 2025 — v1.3 by Kevin Febriano
+  </div>
+  
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       
@@ -246,14 +239,12 @@
         window.location.href = 'visual-bandul.html';
       });
 
-      // --- 👇 TAMBAHAN FITUR ENTER ADA DI SINI 👇 ---
       document.getElementById('fakeScanInput').addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
-          e.preventDefault(); // Mencegah default action (seperti submit form)
-          document.getElementById('fakeScanBtn').click(); // Memicu klik pada tombol
+          e.preventDefault();
+          document.getElementById('fakeScanBtn').click();
         }
       });
-      // --- AKHIR TAMBAHAN ---
 
     });
   </script>

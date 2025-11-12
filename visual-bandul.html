@@ -8,37 +8,29 @@
     :root {
       --danger: #d9534f;
       font-family: "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
-      --bg: #fbf7f1; /* <-- MENAMBAHKAN VARIABEL WARNA DARI LAMAN LAIN */
+      --bg: #fbf7f1;
     }
     
     body {
-      /* --- PERUBAHAN UTAMA DI SINI --- */
-      background: linear-gradient(180deg, var(--bg), #fffefb); /* Diubah dari #f0f0f0 */
-      
+      background: linear-gradient(180deg, var(--bg), #fffefb);
+      /* --- PERUBAHAN: Hapus scale, tambah flex --- */
       display: flex;
       flex-direction: column;
       min-height: 100vh;
       margin: 0;
       text-align: center;
-      overflow: hidden; 
       color: #333;
       line-height: 1.5; 
-    }
-    
-    .scale-wrapper {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
       align-items: center;
       justify-content: center;
-      transform: scale(1.25);
-      transform-origin: center center;
-      overflow-y: auto; 
-      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
     }
     
+    /* --- PERUBAHAN: Hapus .scale-wrapper --- */
+    
     .wrap {
-      width: 90%;
+      width: 100%;
       max-width: 300px;
       display: flex;
       flex-direction: column;
@@ -118,7 +110,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-shrink: 0; 
     }
   </style>
 </head>
@@ -126,19 +117,18 @@
 
   <a href="kamera.html" id="closeBtn" title="Batal & Kembali ke Scan">&times;</a>
 
-  <div class="scale-wrapper"> 
-    <div class="wrap">
-      <h1>Input Skor Visual</h1>
-      <h2>Untuk: <span id="athleteName">...</span></h2>
-      <p>Klik pada area bandul di bawah untuk mencatat skor</p>
+  <div class="wrap">
+    <h1>Input Skor Visual</h1>
+    <h2>Untuk: <span id="athleteName">...</span></h2>
+    <p>Klik pada area bandul di bawah untuk mencatat skor</p>
 
-      <div id="bandulClickArea"></div>
-    </div>
-
-    <div class="footer-watermark"> 
-      Jemparingan Scorekeeper © 2025 — v1.3 by Kevin Febriano
-    </div>
+    <div id="bandulClickArea"></div>
   </div>
+
+  <div class="footer-watermark"> 
+    Jemparingan Scorekeeper © 2025 — v1.3 by Kevin Febriano
+  </div>
+  
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       const athleteName = localStorage.getItem('atletUntukScan');
