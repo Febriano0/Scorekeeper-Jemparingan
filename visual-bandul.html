@@ -122,7 +122,9 @@
         queue.push(entry);
         localStorage.setItem('scannedScoresQueue', JSON.stringify(queue));
         
-        window.location.href = 'kamera.html';
+        // --- PERBAIKAN BUG UTAMA ADA DI SINI ---
+        // Mengarahkan kembali ke papan skor utama, bukan ke kamera lagi.
+        window.location.href = 'jemparingan.html';
       }
     });
   </script>
