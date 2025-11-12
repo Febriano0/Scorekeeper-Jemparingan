@@ -9,25 +9,64 @@
       --danger: #d9534f;
       font-family: "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
     }
+    
     body {
       background: #f0f0f0;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
       min-height: 100vh;
       margin: 0;
       text-align: center;
-      /* HAPUS 'transform' & 'overflow' DARI SINI */
+      overflow: hidden; 
+      color: #333;
+      line-height: 1.5; 
     }
+    
+    .scale-wrapper {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      align-items: center;
+      /* --- PERBAIKAN UTAMA DI SINI --- */
+      justify-content: center; /* Diubah dari space-between */
+      transform: scale(1.25);
+      transform-origin: center center;
+      overflow-y: auto; 
+      width: 100%;
+    }
+    
     .wrap {
       width: 90%;
       max-width: 300px;
-      /* --- TAMBAHKAN SKALA DI SINI --- */
-      transform: scale(1.25);
+      /* --- DAN DI SINI --- */
+      /* flex-grow: 1; */ /* Dihapus agar tidak mendorong footer */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding-top: 50px; 
+      padding-bottom: 20px;
+      text-align: center;
     }
-    h1 { font-size: 1.5em; }
-    #athleteName { color: #8b5e3c; }
+    h1 { 
+      font-size: 1.5em; 
+      color: #8b5e3c;
+      margin-bottom: 0.5em; 
+    }
+    h2 {
+      font-size: 1.2em;
+      margin-top: 0; 
+      margin-bottom: 1em; 
+    }
+    #athleteName { 
+      color: #333;
+      font-weight: bold;
+    }
+    p {
+      margin-top: 0;
+      margin-bottom: 1.5em; 
+      color: #555; 
+    }
     .bandul-visual {
       height: 400px;
       width: 80px;  
@@ -35,6 +74,7 @@
       border-radius: 10px; 
       margin: 20px auto;
       cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
     }
     .bandul-321 {
       background: linear-gradient(to bottom,
@@ -61,9 +101,25 @@
       line-height: 1;
       padding: 5px;
       transition: color 0.2s ease;
+      z-index: 10; 
     }
     #closeBtn:hover {
       color: #333; 
+    }
+    /* Gaya untuk watermark */
+    .footer-watermark {
+      text-align:center;
+      font-size:12px;
+      /* --- WARNA DIBUAT SANGAT JELAS --- */
+      color: #333; 
+      margin-top:25px; 
+      padding-bottom: 15px;
+      width: 100%;
+      min-height: 30px; 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0; 
     }
   </style>
 </head>
@@ -71,15 +127,20 @@
 
   <a href="kamera.html" id="closeBtn" title="Batal & Kembali ke Scan">&times;</a>
 
-  <div class="wrap">
-    <h1>Input Skor Visual</h1>
-    <h2>Untuk: <span id="athleteName">...</span></h2>
-    <p>Klik pada area bandul di bawah untuk mencatat skor</p>
+  <div class="scale-wrapper"> 
+    <div class="wrap">
+      <h1>Input Skor Visual</h1>
+      <h2>Untuk: <span id="athleteName">...</span></h2>
+      <p>Klik pada area bandul di bawah untuk mencatat skor</p>
 
-    <div id="bandulClickArea"></div>
+      <div id="bandulClickArea"></div>
+    </div>
 
+    <div class="footer-watermark"> 
+      Jemparingan Scorekeeper © 2025 — v1.3 by Kevin Febriano
+    </div>
+  </div>
   <script>
-    // ... (Script Anda tidak berubah)
     document.addEventListener('DOMContentLoaded', () => {
       const athleteName = localStorage.getItem('atletUntukScan');
       const mode = localStorage.getItem('targetMode') || '321';
@@ -122,11 +183,10 @@
         queue.push(entry);
         localStorage.setItem('scannedScoresQueue', JSON.stringify(queue));
         
-        // --- PERBAIKAN BUG UTAMA ADA DI SINI ---
-        // Mengarahkan kembali ke papan skor utama, bukan ke kamera lagi.
         window.location.href = 'jemparingan.html';
       }
     });
   </script>
+
 </body>
 </html>

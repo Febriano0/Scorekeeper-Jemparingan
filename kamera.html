@@ -5,22 +5,32 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Scan Barcode</title>
   <style>
+    
     body { 
       font-family: "Segoe UI", Roboto, system-ui, -apple-system, sans-serif;
       background: #333; 
       color: white; 
       margin: 0;
+      height: 100vh;
+      overflow: hidden; 
+    }
+    
+    .scale-wrapper {
       display: flex;
       flex-direction: column;
-      height: 100vh;
+      height: 100vh; 
       align-items: center;
       justify-content: center;
+      transform: scale(1.25);
+      transform-origin: center center; 
+      overflow-y: auto; 
+      width: 100%;
     }
+    
     .wrap {
       width: 90%;
       max-width: 450px; 
       text-align: center;
-      transform: scale(1.25);
     }
     h1 {
       margin-bottom: 30px;
@@ -28,7 +38,7 @@
       color: #FFD700; 
       text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
     }
-    /* ... (Sisa CSS Anda tidak berubah) ... */
+    
     .scan-area {
       position: relative; 
       width: 300px; 
@@ -127,7 +137,7 @@
         background: #FFC107; 
     }
     #closeBtn {
-      position: absolute;
+      position: absolute; 
       top: 20px;
       left: 20px;
       font-size: 2.5em; 
@@ -137,9 +147,25 @@
       line-height: 1;
       padding: 5px;
       transition: color 0.2s ease;
+      z-index: 10;
     }
     #closeBtn:hover {
       color: #FFD700; 
+    }
+
+    .footer-watermark {
+      text-align:center;
+      font-size:12px;
+
+      color: #aaa;
+      margin-top:25px; 
+      padding-bottom: 15px;
+      width: 100%; 
+      min-height: 30px; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      flex-shrink: 0; 
     }
   </style>
 </head>
@@ -147,61 +173,81 @@
 
   <a href="jemparingan.html" id="closeBtn" title="Selesai & Kembali">&times;</a>
 
-  <div class="wrap">
-    <h1>Scan Barcode Atlet</h1>
-    <div class="scan-area">
-      <div class="corner-top-right"></div>
-      <div class="corner-bottom-left"></div>
-      <span style="color: #bbb;">Arahkan Kamera Disini</span>
+  <div class="scale-wrapper">
+    <div class="wrap">
+      <h1>Scan Barcode Anak Panah</h1>
+      <div class="scan-area">
+        <div class="corner-top-right"></div>
+        <div class="corner-bottom-left"></div>
+        <span style="color: #bbb;">Arahkan Barcode Disini</span>
+      </div>
+      
+      <p>Barcode berisi nama atlet</p>
+      <input type="text" id="fakeScanInput" placeholder="Masukkan isi barcode" />
+      <button id="fakeScanBtn">Simulasikan Scan & Lanjut</button>
     </div>
-    
-    <p>Barcode berisi nama atlet</p>
-    <input type="text" id="fakeScanInput" placeholder="Masukkan isi barcode" />
-    <button id="fakeScanBtn">Simulasikan Scan & Lanjut</button>
 
+    <div class="footer-watermark"> 
+      Jemparingan Scorekeeper © 2025 — v1.3 by Kevin Febriano
+    </div>
+  </div>
   <script>
-    document.getElementById('fakeScanBtn').addEventListener('click', () => {
-      const nameInput = document.getElementById('fakeScanInput').value;
-      const name = nameInput.toLowerCase();
-      if (!nameInput) {
-        alert('Untuk simulasi, masukkan nama atlet.');
-        return;
-      }
-
-      const stateJSON = localStorage.getItem('jemparinganState');
-      const queueJSON = localStorage.getItem('scannedScoresQueue') || '[]';
+    document.addEventListener('DOMContentLoaded', () => {
       
-      let currentEnd = 1;
-      let existingScores = 0;
-      let pendingScores = 0;
+      document.getElementById('fakeScanBtn').addEventListener('click', () => {
+        const nameInput = document.getElementById('fakeScanInput').value;
+        const name = nameInput.toLowerCase();
+        if (!nameInput) {
+          alert('Untuk simulasi, masukkan nama atlet.');
+          return;
+        }
 
-      if (stateJSON) {
-        try {
-          const state = JSON.parse(stateJSON);
-          currentEnd = state.currentEnd;
-          
-          const p = state.competitors.find(c => c.name.toLowerCase() === name);
-          if (p) {
-            existingScores = p.scores[currentEnd].filter(s => s !== null).length;
+        const stateJSON = localStorage.getItem('jemparinganState');
+        const queueJSON = localStorage.getItem('scannedScoresQueue') || '[]';
+        
+        let currentEnd = 1;
+        let existingScores = 0;
+        let pendingScores = 0;
+
+        if (stateJSON) {
+          try {
+            const state = JSON.parse(stateJSON);
+            currentEnd = state.currentEnd || 1; 
+            
+            if (state.competitors && Array.isArray(state.competitors)) {
+              const p = state.competitors.find(c => c.name.toLowerCase() === name);
+              
+              if (p && p.scores && p.scores[currentEnd] && Array.isArray(p.scores[currentEnd])) {
+                existingScores = p.scores[currentEnd].filter(s => s !== null).length;
+              }
+            }
+          } catch (e) { 
+            console.error("Gagal baca state:", e); 
+            existingScores = 0; 
           }
-        } catch (e) { console.error("Gagal baca state:", e); }
-      }
-      
-      try {
-        const queue = JSON.parse(queueJSON);
-        pendingScores = queue.filter(item => item.name.toLowerCase() === name).length;
-      } catch (e) { console.error("Gagal baca antrian:", e); }
+        }
+        
+        try {
+          const queue = JSON.parse(queueJSON);
+          pendingScores = queue.filter(item => item.name.toLowerCase() === name).length;
+        } catch (e) { 
+          console.error("Gagal baca antrian:", e); 
+          pendingScores = 0; 
+        }
 
-      const totalPending = existingScores + pendingScores;
-      
-      if (totalPending >= 4) {
-        alert(`Skor Seri ${currentEnd} untuk ${nameInput} sudah penuh (4 panah).\n\n(Skor tersimpan: ${existingScores}, Skor di antrian: ${pendingScores})`);
-        return;
-      }
-      
-      localStorage.setItem('atletUntukScan', nameInput);
-      window.location.href = 'visual-bandul.html';
+        const totalPending = existingScores + pendingScores;
+        
+        if (totalPending >= 4) {
+          alert(`Skor Seri ${currentEnd} untuk ${nameInput} sudah penuh (4 panah).\n\n(Skor tersimpan: ${existingScores}, Skor di antrian: ${pendingScores})`);
+          return; 
+        }
+        
+        localStorage.setItem('atletUntukScan', nameInput);
+        window.location.href = 'visual-bandul.html';
+      });
+
     });
   </script>
+  
 </body>
 </html>
